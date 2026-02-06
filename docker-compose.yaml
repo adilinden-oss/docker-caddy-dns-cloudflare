@@ -1,0 +1,40 @@
+services:
+
+  php-test:
+    image: php:8.4-apache
+    container_name: php-test
+    tty: true
+    volumes:
+      - ${PWD}/php/html:/var/www/html
+      - ${PWD}/php/apache/sites-available:/etc/apache2/sites-available
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+  
+  caddy:
+    build:
+      context: ./caddy-cloudflare
+      args:
+        CADDY_VERSION: ${CADDY_VERSION}
+    image: caddy-cloudflare:${CADDY_VERSION}
+    container_name: caddy
+    depends_on: 
+      - php-test
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - CADDY_UPSTREAM=php-test:80
+      - CADDY_DOMAIN=${CADDY_DOMAIN}
+      - CADDY_CLOUDFLARE_API_TOKEN=${CADDY_CLOUDFLARE_API_TOKEN}
+    volumes:
+      - ${PWD}/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

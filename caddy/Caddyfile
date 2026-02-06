@@ -1,0 +1,6 @@
+{$CADDY_DOMAIN} {
+    reverse_proxy {$CADDY_UPSTREAM}
+    tls {
+        dns cloudflare {env.CADDY_CLOUDFLARE_API_TOKEN}
+    }
+}
