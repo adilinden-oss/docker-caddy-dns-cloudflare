@@ -13,6 +13,7 @@ To build run:
 
 ```
 docker compose build
+docker builder prune # optional
 docker compose up
 ```
 
